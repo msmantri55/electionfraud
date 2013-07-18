@@ -1,0 +1,33 @@
+Election has:
+	 one or more Questions
+	 one or more Voters
+	 zero or one Ballots per Voter
+	 one set of Results per Question
+
+Ballot has:
+       one or more Questions
+       zero or one Responses per Question
+
+Question has:
+	 two or more Choices
+	 one ChoiceArrangement
+	 one ResponseFormat
+	 one CountingMethod
+
+ResponseFormat is:
+	     choose no more than N
+	     rank all choices in order of preference
+	     rank some choices in order of preference, 
+	     
+
+CountingMethod is:
+	       Borda, Nauru variant
+	       Bucklin
+	       Condorcet (pairwise)
+	       contingent vote N
+	       contingent vote 1 supplementary
+	       contingent vote 2 Sri Lankan
+	       Coombs' method
+	       first past the post (basic frequency counter)
+	       instant runoff
+	       Nanson's method
