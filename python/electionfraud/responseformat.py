@@ -16,6 +16,19 @@ class WrongNumberOfChoices(ResponseException):
     """
     pass
 
+class InvalidChoice(ResponseException):
+    """
+    Raised when the voter makes a choice that was not in the set of
+    acceptable choices.
+    """
+    pass
+
+class DuplicateChoice(ResponseException):
+    """
+    Raised when the voter chooses something more than the rules permit.
+    """
+    pass
+
 class Abstract:
     """
     The various response formats are derived from this abstract base class.
@@ -43,7 +56,7 @@ class Abstract:
             return
         for choice in responses:
             if choice not in field:
-                raise InvalidChoiceException(choice, field)
+                raise InvalidChoice(choice, field)
 
     def detect_duplicates(self, responses):
         """
@@ -51,7 +64,7 @@ class Abstract:
         of the original responses to a mashed-into-set version.
         """
         if len(responses) > len(set(responses)):
-            raise ResponseException('duplicate choices not allowed')
+            raise DuplicateChoice('duplicate choices not allowed')
 
 class ChooseExactly(Abstract):
     """
@@ -81,7 +94,7 @@ class ChooseNoMoreThan(Abstract):
         if not isinstance(responses, set):
             raise ResponseException(self.__class__ + 'expects a set')
         if len(responses) > self.maximum:
-            raise ResponseException('limited to no more than %d choices' % (self.maximum))
+            raise WrongNumberOfChoices('limited to no more than %d choices' % (self.maximum))
         self.detect_duplicates(responses)
         self.validate_choices(responses, field)
 
@@ -108,5 +121,5 @@ class RankAllInOrderOfPreference(RankInOrderOfPreference):
     """
     def validate(self, responses, field):
         if len(responses) != len(field):
-            raise ResponseException('all choices in field must be ranked')
+            raise WrongNumberOfChoices('all choices in field must be ranked')
         RankInOrderOfPreference.validate(self, responses, field)
