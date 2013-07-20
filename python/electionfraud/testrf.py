@@ -43,6 +43,10 @@ class TestRiOoP(ResponseFormatTest):
         ResponseFormatTest.setUp(self)
         self.rf = efrf.RankInOrderOfPreference()
 
+    def test_format(self):
+        responses = list(eftd.TENNESSEE.keys())
+        self.assertIsNone(self.rf.validate(responses, self.field))
+
 class TestRAiOoP(ResponseFormatTest):
 
     def setUp(self):
@@ -51,6 +55,16 @@ class TestRAiOoP(ResponseFormatTest):
 
     def test_too_few(self):
         responses = list(eftd.TENNESSEE.keys())[0:3]
+        self.assertRaises(efrf.WrongNumberOfChoices, self.rf.validate, responses, self.field)
+
+class TestRNMTiOoP(ResponseFormatTest):
+
+    def setUp(self):
+        ResponseFormatTest.setUp(self)
+        self.rf = efrf.RankNoMoreThanInOrderOfPreference(3)
+
+    def test_too_many(self):
+        responses = list(eftd.TENNESSEE.keys())
         self.assertRaises(efrf.WrongNumberOfChoices, self.rf.validate, responses, self.field)
 
 class TestRatings(ResponseFormatTest):

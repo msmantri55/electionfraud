@@ -149,8 +149,6 @@ class RankInOrderOfPreference(Abstract):
     preferred choices towards the front of the list.
     """
     def validate(self, responses, field):
-        if not isinstance(responses.__class__, list):
-            raise ResponseException(self.__class__ + 'wants a list')
         self.detect_duplicates(responses)
         self.validate_choices(responses, field)
 
