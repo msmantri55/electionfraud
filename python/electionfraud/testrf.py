@@ -21,7 +21,7 @@ class TestChooseExactly(ResponseFormatTest):
         self.assertRaises(efrf.WrongNumberOfChoices, self.rf.validate, responses, self.field)
 
     def test_too_few(self):
-        responses = set(list(eftd.TENNESSEE.keys())[0])
+        responses = set([list(eftd.TENNESSEE.keys())[0]])
         self.assertRaises(efrf.WrongNumberOfChoices, self.rf.validate, responses, self.field)
 
     def test_none_at_all(self):
@@ -78,11 +78,11 @@ class TestRatings(ResponseFormatTest):
         self.assertRaises(efrf.NonIntegerRating, self.rf.validate, responses, self.field)
 
     def test_negative_ratings(self):
-        responses = [(x,-1 * len(x)) for x in self.field]
+        responses = [(x,-1) for x in self.field]
         self.assertRaises(efrf.NegativeRating, self.rf.validate, responses, self.field)
 
     def test_overly_positive_ratings(self):
-        responses = [(x, len(x)) for x in self.field]
+        responses = [(x, 5 + len(self.field)) for x in self.field]
         self.assertRaises(efrf.OverMaximumRating, self.rf.validate, responses, self.field)
 
 class TestBudget(ResponseFormatTest):
@@ -92,7 +92,7 @@ class TestBudget(ResponseFormatTest):
         self.rf = efrf.Budget(20)
 
     def test_excess(self):
-        responses = [(x, len(x)) for x in self.field]
+        responses = [(x, 19 + len(self.field)) for x in self.field]
         self.assertRaises(efrf.OverBudget, self.rf.validate, responses, self.field)
 
 class TestPairwise(ResponseFormatTest):

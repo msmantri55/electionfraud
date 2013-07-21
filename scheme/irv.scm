@@ -18,7 +18,7 @@
   (if (irv-exhausted? vote) #f (car vote)))
 
 (define (irv-round votes prevrounds)
-  (let* ((half (/ (length (irv-not-exhausted votes)) 2)
+  (let* ((half (/ (length (irv-not-exhausted votes)) 2))
 	 (thisround (tally 
 		     (filter notfalse? (map irv-first-choice votes))))
 	 (maybewinner (leader thisround)))
