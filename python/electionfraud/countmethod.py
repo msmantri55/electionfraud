@@ -209,10 +209,10 @@ class InstantRunoffVoting(Abstract):
             interpretation += round.interpret_results()
         return interpretation
 
-    def leaders(self):
+    def leader(self):
         self.are_we_there_yet()
-        return self.results.leaders()
+        return self.results.leader()
 
-    def trailers(self):
+    def trailer(self):
         self.are_we_there_yet()
-        return self.results.trailers()
+        return self.results.trailer()

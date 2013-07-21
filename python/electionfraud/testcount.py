@@ -14,6 +14,9 @@ class TestFPTP(CountMethodTest):
         self.cm = efcm.FirstPastThePost()
         pass
 
+    def test_premature(self):
+        self.assertRaises(efcm.IncompleteCount, self.cm.leader)
+
     def test_fptp(self):
         self.cm.count(eftd.TN_FPTP_100)
         self.assertEqual(self.cm.residue, len(eftd.TN_FPTP_100))
@@ -24,6 +27,9 @@ class TestIRV(CountMethodTest):
     
     def setUp(self):
         self.cm = efcm.InstantRunoffVoting()
+
+    def test_premature(self):
+        self.assertRaises(efcm.IncompleteCount, self.cm.leader)
 
     def test_irv_tennessee(self):
         self.cm.count(eftd.TN_IRV_100)
