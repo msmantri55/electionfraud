@@ -48,7 +48,6 @@ class TestIRV(CountMethodTest):
         self.assertEqual(self.cm.residue[2][eftd.memphis], 42)
         self.assertEqual(self.cm.residue[2][eftd.knoxville], 58)
 
-        
 
 class TestCoombs(CountMethodTest):
 
@@ -77,9 +76,6 @@ class TestCoombs(CountMethodTest):
         self.assertEqual(leaders[eftd.chattanooga], 15)
         self.assertEqual(trailers[eftd.knoxville], 68)
         self.assertEqual(trailers[eftd.nashville], 32)
-
-
-# ;Value 4: ((((nashville . 68) (chattanooga . 15) (knoxville . 17)) ((knoxville . 68) (nashville . 32))) (((memphis . 42) (nashville . 26) (chattanooga . 15) (knoxville . 17)) ((knoxville . 42) (memphis . 58))))
 
 
 if __name__ == '__main__':
