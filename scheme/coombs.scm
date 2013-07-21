@@ -15,12 +15,12 @@
 	 (maybeloser (leader last-place)))
     (if (> (cdr maybewinner) half)
 	(cons
-	 (list thisround-firstplace thisround-lastplace)
+	 (list first-place last-place)
 	 results)
 	(coombs-round
 	 (irv-disqualify (car maybeloser) votes)
 	 (cons
-	  (list thisround-firstplace thisround-lastplace)
+	  (list first-place last-place)
 	  results)))))
   
 (define (coombs votes)

@@ -186,7 +186,7 @@ class InstantRunoffVoting(Abstract):
         maybe_winner = counter.leader()
         self.residue.append(this_round)
         if counter.results[maybe_winner] > half:
-            self.results = this_round
+            self.results = self.residue[-1]
             return
         loser = counter.trailer()
         next_round = [self.disqualify(x, loser) for x in responses]
@@ -198,7 +198,7 @@ class InstantRunoffVoting(Abstract):
 
     def interpret_result(self):
         self.are_we_there_yet()
-        return 'Final round:\n' + self.results.interpret_results()
+        return 'Final round:\n' + self.results.interpret_result()
         
     def interpret_residue(self):
         self.are_we_there_yet()
@@ -216,3 +216,64 @@ class InstantRunoffVoting(Abstract):
     def trailer(self):
         self.are_we_there_yet()
         return self.results.trailer()
+
+class CoombsMethod(InstantRunoffVoting):
+    """
+    http://en.wikipedia.org/wiki/Coombs%27_method
+
+    Very similar to Instant Runoff, but the chief difference is that
+    the choice with the most last-place votes is eliminated each round,
+    rather than the fewest first-place votes.
+
+    Because this method requires keeping track of both first-place and 
+    last-place results, the result is a 2-tuple containing the first-place
+    and last-place results, and the residue is the record of rounds.
+    """
+    def count(self, responses):
+        non_exhausted_votes = [x for x in responses if len(x)]
+        half = int(len(non_exhausted_votes) / 2)
+        first_choices = [[x[0]] for x in responses if len(x)]
+        last_choices = [[x[-1]] for x in responses if len(x)]
+        firstcounter = FirstPastThePost()
+        firstcounter.count(first_choices)
+        firstplace = firstcounter.results
+        lastcounter = FirstPastThePost()
+        lastcounter.count(last_choices)
+        lastplace = lastcounter.results
+        maybe_winner = firstcounter.leader()
+        maybe_loser = lastcounter.leader()
+        self.residue.append((firstplace, lastplace))
+        if firstcounter.results[maybe_winner] > half:
+            self.results = self.residue[-1]
+            return
+        next_round = [self.disqualify(x, maybe_loser) for x in responses]
+        self.count(next_round)
+
+    def interpret_result(self):
+        self.are_we_there_yet()
+        interpretation = 'Final round:\n'
+        leaders, trailers = self.results
+        interpretation += 'Leaders:\n' + leaders.interpret_result()
+        interpretation += 'Trailers:\n' + trailers.interpret_result()
+        return interpretation
+        
+    def interpret_residue(self):
+        self.are_we_there_yet()
+        interpretation = ''
+        ctr = 1
+        for round in self.residue:
+            leaders, trailers = round
+            interpretation += 'Round %d\n' % (ctr)
+            interpretation += 'Leaders:\n' + leaders.interpret_result()
+            interpretation += 'Trailers:\n' + trailers.interpret_result()
+        return interpretation
+
+    def leader(self):
+        self.are_we_there_yet()
+        leaders, _ = self.results
+        return leaders.leader()
+
+    def trailer(self):
+        self.are_we_there_yet()
+        _, trailers = self.results
+        return trailers.leader()

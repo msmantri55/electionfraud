@@ -33,7 +33,9 @@ class TestIRV(CountMethodTest):
 
     def test_irv_tennessee(self):
         self.cm.count(eftd.TN_IRV_100)
-        # round 0
+        # invariant
+        self.assertEqual(self.cm.results, self.cm.residue[-1])
+        # initial round 0
         self.assertEqual(self.cm.residue[0][eftd.chattanooga], 15)
         self.assertEqual(self.cm.residue[0][eftd.knoxville], 17)
         self.assertEqual(self.cm.residue[0][eftd.nashville], 26)
@@ -42,15 +44,43 @@ class TestIRV(CountMethodTest):
         self.assertEqual(self.cm.residue[1][eftd.nashville], 26)
         self.assertEqual(self.cm.residue[1][eftd.knoxville], 32)
         self.assertEqual(self.cm.residue[1][eftd.memphis], 42)
-        # round 2
+        # final round 2
         self.assertEqual(self.cm.residue[2][eftd.memphis], 42)
         self.assertEqual(self.cm.residue[2][eftd.knoxville], 58)
-        # final
-        self.assertEqual(self.cm.results[eftd.memphis], 42)
-        self.assertEqual(self.cm.results[eftd.knoxville], 58)
-        # stupid sanity
-        self.assertEqual(self.cm.results, self.cm.residue[-1])
+
         
+
+class TestCoombs(CountMethodTest):
+
+    def setUp(self):
+        self.cm = efcm.CoombsMethod()
+
+    def test_premature(self):
+        self.assertRaises(efcm.IncompleteCount, self.cm.leader)
+
+    def test_coombs_tennessee(self):
+        self.cm.count(eftd.TN_IRV_100)
+        # invariant
+        self.assertEqual(self.cm.results, self.cm.residue[-1])
+        # initial round 0
+        leaders, trailers = self.cm.residue[0]
+        self.assertEqual(leaders[eftd.memphis], 42)
+        self.assertEqual(leaders[eftd.nashville], 26)
+        self.assertEqual(leaders[eftd.knoxville], 17)
+        self.assertEqual(leaders[eftd.chattanooga], 15)
+        self.assertEqual(trailers[eftd.memphis], 58)
+        self.assertEqual(trailers[eftd.knoxville], 42)
+        # final round 1
+        leaders, trailers = self.cm.results
+        self.assertEqual(leaders[eftd.nashville], 68)
+        self.assertEqual(leaders[eftd.knoxville], 17)
+        self.assertEqual(leaders[eftd.chattanooga], 15)
+        self.assertEqual(trailers[eftd.knoxville], 68)
+        self.assertEqual(trailers[eftd.nashville], 32)
+
+
+# ;Value 4: ((((nashville . 68) (chattanooga . 15) (knoxville . 17)) ((knoxville . 68) (nashville . 32))) (((memphis . 42) (nashville . 26) (chattanooga . 15) (knoxville . 17)) ((knoxville . 42) (memphis . 58))))
+
 
 if __name__ == '__main__':
     unittest.main()
