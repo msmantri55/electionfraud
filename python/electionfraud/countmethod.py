@@ -1,5 +1,7 @@
 # -*- python -*-
 
+import collections
+
 #import logging
 #logging.basicConfig(level=logging.DEBUG)
 
@@ -102,20 +104,18 @@ class FirstPastThePost(Abstract):
     The residue is simply the number of votes counted.
     """
     def __init__(self):
-        self.results = dict()
         self.residue = 0
+        self.results = None
+        self._counter = collections.Counter()
     
     def count(self, responses):
         for response in responses:
-            self.residue += 1
-            for choice in response:
-                try:
-                    self.results[choice] += 1
-                except KeyError:
-                    self.results[choice] = 1
+            self._counter.update(response)
+        self.results = self._counter
+        self.residue = sum(self._counter.values())
 
     def are_we_there_yet(self):
-        if not len(self.results.keys()):
+        if self.results is None:
             raise IncompleteCount('nobody past the post yet')
 
     def interpret_results(self):
@@ -131,30 +131,15 @@ class FirstPastThePost(Abstract):
         self.are_we_there_yet()
         return '%d total votes cast\n' % (self.residue)
 
-    def leaders(self):
+    def leader(self):
         self.are_we_there_yet()
-        leader = []
-        most = -1
-        for choice in self.results.keys():
-            if self.results[choice] == most:
-                leader.append(choice)
-            if self.results[choice] > most:
-                most = self.results[choice]
-                leader = [choice]
-        return leader
+        first, _ = self._counter.most_common(1)[0]
+        return first
 
-    def trailers(self):
+    def trailer(self):
         self.are_we_there_yet()
-        trailer = []
-        least = self.residue
-        for choice in self.results.keys():
-            if self.results[choice] == least:
-                trailer.append(choice)
-            if self.results[choice] < least:
-                least = self.results[choice]
-                trailer = [choice]
-
-        return trailer
+        last, _ = self._counter.most_common()[-1]
+        return last
 
 class InstantRunoffVoting(Abstract):
     """
@@ -165,10 +150,9 @@ class InstantRunoffVoting(Abstract):
     choice has more than half the votes, the choice that received the
     fewest votes is eliminated, and the ballots that listed the
     eliminated choice as their highest preference are recounted in the
-    next round as if that eliminated choice were not available.
-
-    In this implementation, if there is a last-place tie at the end of
-    a round, all of those choices are disqualified for the next round.
+    next round as if that eliminated choice were not available.  If
+    there is a tie for last place at the end of a given round, the tie
+    is broken arbitrarily.  (See collections.Counter.most_common()).
     """
 
     def __init__(self):
@@ -182,11 +166,11 @@ class InstantRunoffVoting(Abstract):
         self.residue = []
         self.results = None
 
-    def disqualify(self, response, losers):
+    def disqualify(self, response, loser):
         """
         Returns a modified ballot, with eliminated choices removed.
         """
-        return [choice for choice in response if choice not in losers]
+        return [choice for choice in response if choice != loser]
 
     def count(self, responses):
         """
@@ -199,13 +183,13 @@ class InstantRunoffVoting(Abstract):
         counter = FirstPastThePost()
         counter.count(first_choices)
         this_round = counter.results
-        maybe_winner = counter.leaders()[0]
+        maybe_winner = counter.leader()
         self.residue.append(this_round)
         if counter.results[maybe_winner] > half:
             self.results = this_round
             return
-        losers = counter.trailers()
-        next_round = [self.disqualify(x, losers) for x in responses]
+        loser = counter.trailer()
+        next_round = [self.disqualify(x, loser) for x in responses]
         self.count(next_round)
 
     def are_we_there_yet(self):
