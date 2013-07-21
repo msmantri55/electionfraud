@@ -35,21 +35,21 @@ TN_IRV_100 = TN_IRV_100 + [[nashville, chattanooga, knoxville, memphis]] * 26
 TN_IRV_100 = TN_IRV_100 + [[chattanooga, knoxville, nashville, memphis]] * 15
 TN_IRV_100 = TN_IRV_100 + [[knoxville, chattanooga, nashville, memphis]] * 17
 
-ABC_CHOOSE_2 = [[a, b]] * 30
-ABC_CHOOSE_2 = ABC_CHOOSE_2 + [[a, c]] * 6
-ABC_CHOOSE_2 = ABC_CHOOSE_2 + [[b, a]] * 9
-ABC_CHOOSE_2 = ABC_CHOOSE_2 + [[b, c]] * 7
-ABC_CHOOSE_2 = ABC_CHOOSE_2 + [[c, b]] * 28
-ABC_CHOOSE_2 = ABC_CHOOSE_2 + [[c, a]] * 20
+ABC_CV_2 = [[a, b]] * 30
+ABC_CV_2 = ABC_CV_2 + [[a, c]] * 6
+ABC_CV_2 = ABC_CV_2 + [[b, a]] * 9
+ABC_CV_2 = ABC_CV_2 + [[b, c]] * 7
+ABC_CV_2 = ABC_CV_2 + [[c, b]] * 28
+ABC_CV_2 = ABC_CV_2 + [[c, a]] * 20
 
-ABCD_CHOOSE_3 = [[A, B, C]] * 34
-ABCD_CHOOSE_3 = ABCD_CHOOSE_3 + [[B, C, D]] * 17
-ABCD_CHOOSE_3 = ABCD_CHOOSE_3 + [[C, B, A]] * 22
-ABCD_CHOOSE_3 = ABCD_CHOOSE_3 + [[C, D, B]] * 10
-ABCD_CHOOSE_3 = ABCD_CHOOSE_3 + [[D, C, B]] * 37
+ABCD_CV_3 = [[A, B, C]] * 34
+ABCD_CV_3 = ABCD_CV_3 + [[B, C, A]] * 17
+ABCD_CV_3 = ABCD_CV_3 + [[C, B, A]] * 22
+ABCD_CV_3 = ABCD_CV_3 + [[C, D, B]] * 10
+ABCD_CV_3 = ABCD_CV_3 + [[D, C, B]] * 37
 
-ABCD_CHOOSE_4 = [[a, c, b, d]] * 51
-ABCD_CHOOSE_4 = ABCD_CHOOSE_4 + [[c, b, d, a]] * 5
-ABCD_CHOOSE_4 = ABCD_CHOOSE_4 + [[b, c, d, a]] * 23
-ABCD_CHOOSE_4 = ABCD_CHOOSE_4 + [[d, c, b, a]] * 21
+ABCD_CV_4 = [[a, c, b, d]] * 51
+ABCD_CV_4 = ABCD_CV_4 + [[c, b, d, a]] * 5
+ABCD_CV_4 = ABCD_CV_4 + [[b, c, d, a]] * 23
+ABCD_CV_4 = ABCD_CV_4 + [[d, c, b, a]] * 21
 

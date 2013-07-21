@@ -77,6 +77,36 @@ class TestCoombs(CountMethodTest):
         self.assertEqual(trailers[eftd.knoxville], 68)
         self.assertEqual(trailers[eftd.nashville], 32)
 
+class TestContingent(CountMethodTest):
+    
+    def setUp(self):
+        self.cm = efcm.ContingentVote()
+
+    def test_supplementary(self):
+        self.cm.count(eftd.ABC_CV_2)
+        # invariant
+        self.assertEqual(self.cm.results, self.cm.residue[-1])
+        # round 1
+        self.assertEqual(self.cm.residue[0][eftd.a], 36)
+        self.assertEqual(self.cm.residue[0][eftd.b], 16)
+        self.assertEqual(self.cm.residue[0][eftd.c], 48)
+        # round 2
+        self.assertEqual(self.cm.residue[1][eftd.a], 45)
+        self.assertEqual(self.cm.residue[1][eftd.c], 55)
+
+    def test_sri_lankan(self):
+        self.cm.count(eftd.ABCD_CV_3)
+        # invariant
+        self.assertEqual(self.cm.results, self.cm.residue[-1])
+        # round 1
+        self.assertEqual(self.cm.residue[0][eftd.A], 34)
+        self.assertEqual(self.cm.residue[0][eftd.B], 17)
+        self.assertEqual(self.cm.residue[0][eftd.C], 32)
+        self.assertEqual(self.cm.residue[0][eftd.D], 37)
+        # round 2
+        self.assertEqual(self.cm.residue[1][eftd.A], 73)
+        self.assertEqual(self.cm.residue[1][eftd.D], 47)
+        
 
 if __name__ == '__main__':
     unittest.main()
