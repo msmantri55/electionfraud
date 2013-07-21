@@ -51,42 +51,42 @@ class Abstract:
         BE COUNTED.  (Just because your precinct heavily favors X
         doesn't mean that X will win the election!)
         """
-        raise CountException('counting algorithm not provided')
+        raise NotImplemented(self.__name__ + '.count')
 
     def interpret_result(self):
         """
         Returns a string which can be used to explain the results
         to a human.  The string should end with a newline.
         """
-        raise CountException('results interpretation not provided')
+        raise NotImplemented(self.__name__ + '.interpret_result')
 
     def interpret_residue(self):
         """
         Returns a string which can be used to explain the residue
         to a human.  The string should end with a newline.
         """
-        raise CountException('residue interpretation not provided')
+        raise NotImplemented(self.__name__ + '.interpret_residue')
 
     def leaders(self):
         """
         Returns a list of choices which are considered to be leading, based
         on the results.
         """
-        raise CountException('leaders implementation not provided')
+        raise NotImplemented(self.__name__ + '.leaders')
 
     def trailers(self):
         """
         Returns a list of choices which are considered to be in last place,
         based on the results.
         """
-        raise CountException('trailers implementation not provided')
+        raise NotImplemented(self.__name__ + '.trailers')
 
     def are_we_there_yet(self):
         """
         Raises an exception if there are no results available.
         Returns without raising an exception otherwise.
         """
-        raise CountException('going-there implementation not provided')
+        raise NotImplemented(self.__name__ + '.are_we_there_yet')
 
 class FirstPastThePost(Abstract):
     """
@@ -98,8 +98,7 @@ class FirstPastThePost(Abstract):
     of choices.  Protocols for reducing the set of choices are beyond
     the scope of this counting method.
 
-    Results are stored as a dict with the key being the choice and the
-    value being the number of votes that choice received.
+    Results are stored as a collections.Counter object.
 
     The residue is simply the number of votes counted.
     """
@@ -141,18 +140,14 @@ class FirstPastThePost(Abstract):
         last, _ = self._counter.most_common()[-1]
         return last
 
-class InstantRunoffVoting(Abstract):
+class MultiRoundExhaustible(Abstract):
     """
-    http://en.wikipedia.org/wiki/Instant-runoff_voting 
-
-    The algorithm (and its perils) are best described above, however
-    here is a short summary for the lazy.  If on a given round no
-    choice has more than half the votes, the choice that received the
-    fewest votes is eliminated, and the ballots that listed the
-    eliminated choice as their highest preference are recounted in the
-    next round as if that eliminated choice were not available.  If
-    there is a tie for last place at the end of a given round, the tie
-    is broken arbitrarily.  (See collections.Counter.most_common()).
+    A base class for implementing counting methods that could possibly
+    span multiple rounds, with choices disqualified between rounds for
+    insufficient/excessive first/last place votes.  A voter's vote is
+    considered exhausted if all of its choices have been disqualified.
+    If there is a tie for first/last place at the end of a given
+    round, the tie is broken arbitrarily.
     """
 
     def __init__(self):
@@ -173,32 +168,60 @@ class InstantRunoffVoting(Abstract):
         return [choice for choice in response if choice != loser]
 
     def count(self, responses):
+        raise NotImplemented(self.__name__ + '.count')
+
+    def count_leaders(self, responses):
         """
-        A vote is considered exhausted if all of its choices are
-        disqualified.
+        Tallies up the first choices of all non-exhausted ballots via
+        FirstPastThePost and returns a 2-tuple containing the results
+        and the minimum number of votes required to win.  It is up to
+        the real counting method to use this information appropriately.
         """
         non_exhausted_votes = [x for x in responses if len(x)]
         half = int(len(non_exhausted_votes) / 2)
         first_choices = [[x[0]] for x in responses if len(x)]
         counter = FirstPastThePost()
         counter.count(first_choices)
-        this_round = counter.results
-        maybe_winner = counter.leader()
-        self.residue.append(this_round)
-        if counter.results[maybe_winner] > half:
-            self.results = self.residue[-1]
-            return
-        loser = counter.trailer()
-        next_round = [self.disqualify(x, loser) for x in responses]
-        self.count(next_round)
+        return (counter, half)
 
     def are_we_there_yet(self):
         if self.results is None:
-            raise IncompleteCount('instant runoff still takes finite time')
+            raise IncompleteCount()
 
     def interpret_result(self):
         self.are_we_there_yet()
         return 'Final round:\n' + self.results.interpret_result()
+
+    def leader(self):
+        self.are_we_there_yet()
+        return self.results.leader()
+
+    def trailer(self):
+        self.are_we_there_yet()
+        return self.results.trailer()
+
+class InstantRunoffVoting(MultiRoundExhaustible):
+    """
+    http://en.wikipedia.org/wiki/Instant-runoff_voting 
+
+    The algorithm (and its perils) are best described above, however
+    here is a short summary for the lazy.  If on a given round no
+    choice has more than half the votes, the choice that received the
+    fewest votes is eliminated, and the ballots that listed the
+    eliminated choice as their highest preference are recounted in the
+    next round as if that eliminated choice were not available.  
+    """
+
+    def count(self, responses):
+        (this_round, half) = self.count_leaders(responses)
+        self.residue.append(this_round.results)
+        maybe_winner = this_round.leader()
+        if this_round.results[maybe_winner] > half:
+            self.results = self.residue[-1]
+            return
+        loser = this_round.trailer()
+        next_round = [self.disqualify(x, loser) for x in responses]
+        self.count(next_round)
         
     def interpret_residue(self):
         self.are_we_there_yet()
@@ -209,13 +232,6 @@ class InstantRunoffVoting(Abstract):
             interpretation += round.interpret_results()
         return interpretation
 
-    def leader(self):
-        self.are_we_there_yet()
-        return self.results.leader()
-
-    def trailer(self):
-        self.are_we_there_yet()
-        return self.results.trailer()
 
 class CoombsMethod(InstantRunoffVoting):
     """
@@ -297,6 +313,9 @@ class ContingentVote(InstantRunoffVoting):
         self.residue = []
 
     def requalify(self, response, leaders):
+        """
+        Returns a modified ballot that preserves only the leaders.
+        """
         return [x for x in response if x in leaders]
 
     def count(self, responses):
