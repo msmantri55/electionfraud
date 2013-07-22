@@ -2,8 +2,8 @@
 
 import collections
 
-#import logging
-#logging.basicConfig(level=logging.DEBUG)
+import logging
+logging.basicConfig(level=logging.WARNING)
 
 
 class CountException(Exception):
@@ -106,6 +106,7 @@ class FirstPastThePost(Abstract):
         self.residue = 0
         self.results = None
         self._counter = collections.Counter()
+        self.logger = logging.getLogger('FirstPastThePost')
     
     def count(self, responses):
         for response in responses:
@@ -212,8 +213,13 @@ class InstantRunoffVoting(MultiRoundExhaustible):
     next round as if that eliminated choice were not available.  
     """
 
+    def __init__(self):
+        MultiRoundExhaustible.__init__(self)
+        self.logger = logging.getLogger('InstantRunoffVoting')
+
     def count(self, responses):
-        (this_round, half) = self.count_leaders(responses)
+        this_round, half = self.count_leaders(responses)
+        self.logger.debug(this_round.results.most_common())
         self.residue.append(this_round.results)
         maybe_winner = this_round.leader()
         if this_round.results[maybe_winner] > half:
@@ -245,25 +251,34 @@ class CoombsMethod(InstantRunoffVoting):
     last-place results, the result is a 2-tuple containing the first-place
     and last-place results, and the residue is the record of rounds.
     """
+    def __init__(self):
+        InstantRunoffVoting.__init__(self)
+        self.logger = logging.getLogger('CoombsMethod')
+
     def count(self, responses):
-        non_exhausted_votes = [x for x in responses if len(x)]
-        half = int(len(non_exhausted_votes) / 2)
-        first_choices = [[x[0]] for x in responses if len(x)]
-        last_choices = [[x[-1]] for x in responses if len(x)]
-        firstcounter = FirstPastThePost()
-        firstcounter.count(first_choices)
-        firstplace = firstcounter.results
-        lastcounter = FirstPastThePost()
-        lastcounter.count(last_choices)
-        lastplace = lastcounter.results
-        maybe_winner = firstcounter.leader()
-        maybe_loser = lastcounter.leader()
-        self.residue.append((firstplace, lastplace))
-        if firstcounter.results[maybe_winner] > half:
+        self.logger.debug('new round')
+        firstplace, half = self.count_leaders(responses)
+        lastplace, _ = self.count_trailers(responses)
+        self.logger.debug('leaders')
+        self.logger.debug(firstplace.results.most_common())
+        self.logger.debug('trailers')
+        self.logger.debug(lastplace.results.most_common())
+        maybe_winner = firstplace.leader()
+        maybe_loser = lastplace.leader()
+        self.residue.append((firstplace.results, lastplace.results))
+        if firstplace.results[maybe_winner] > half:
             self.results = self.residue[-1]
             return
         next_round = [self.disqualify(x, maybe_loser) for x in responses]
         self.count(next_round)
+
+    def count_trailers(self, responses):
+        sesnopser = []
+        for response in responses:
+            esnopser = response.copy()
+            esnopser.reverse()
+            sesnopser.append(esnopser)
+        return self.count_leaders(sesnopser)
 
     def interpret_result(self):
         self.are_we_there_yet()
@@ -308,9 +323,10 @@ class ContingentVote(InstantRunoffVoting):
 
     The result is simply the last round in the residue.
     """
+
     def __init__(self):
-        self.results = None
-        self.residue = []
+        InstantRunoffVoting.__init__(self)
+        self.logger = logging.getLogger('ContingentVote')
 
     def requalify(self, response, leaders):
         """
@@ -319,17 +335,13 @@ class ContingentVote(InstantRunoffVoting):
         return [x for x in response if x in leaders]
 
     def count(self, responses):
-        non_exhausted_votes = [x for x in responses if len(x)]
-        half = int(len(non_exhausted_votes) / 2)
-        first_choices = [[x[0]] for x in responses if len(x)]
-        counter = FirstPastThePost()
-        counter.count(first_choices)
-        this_round = counter.results
-        maybe_winner = counter.leader()
-        self.residue.append(this_round)
-        if counter.results[maybe_winner] > half:
+        this_round, half = self.count_leaders(responses)
+        self.logger.debug(this_round.results.most_common())
+        self.residue.append(this_round.results)
+        maybe_winner = this_round.leader()
+        if this_round.results[maybe_winner] > half:
             self.results = self.residue[-1]
             return
-        leaders = [x for x,y in counter.results.most_common(2)]
+        leaders = [x for x,y in this_round.results.most_common(2)]
         next_round = [self.requalify(x, leaders) for x in responses]
         self.count(next_round)
