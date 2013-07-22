@@ -1,13 +1,10 @@
 # -*- python -*-
 
 import collections
-import logging
 import unittest
 
 import electionfraud.countmethod as efcm
 import electionfraud.testdata as eftd
-
-logging.basicConfig(level=logging.DEBUG)
 
 class CountMethodTest(unittest.TestCase):
     pass
