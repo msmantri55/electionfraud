@@ -3,8 +3,14 @@
 import collections
 import unittest
 
-import electionfraud.countmethod as efcm
 import electionfraud.testdata as eftd
+
+import electionfraud.countmethod.contingent as cv
+import electionfraud.countmethod.coombs as coombs
+import electionfraud.countmethod.exception as cmx
+import electionfraud.countmethod.fptp as fptp
+import electionfraud.countmethod.irv as irv
+
 
 class CountMethodTest(unittest.TestCase):
     pass
@@ -12,11 +18,11 @@ class CountMethodTest(unittest.TestCase):
 class TestFPTP(CountMethodTest):
     
     def setUp(self):
-        self.cm = efcm.FirstPastThePost()
+        self.cm = fptp.FirstPastThePost()
         pass
 
     def test_premature(self):
-        self.assertRaises(efcm.IncompleteCount, self.cm.leader)
+        self.assertRaises(cmx.IncompleteCount, self.cm.leader)
 
     def test_fptp(self):
         self.cm.count(eftd.TN_FPTP_100)
@@ -27,10 +33,10 @@ class TestFPTP(CountMethodTest):
 class TestIRV(CountMethodTest):
     
     def setUp(self):
-        self.cm = efcm.InstantRunoffVoting()
+        self.cm = irv.InstantRunoffVoting()
 
     def test_premature(self):
-        self.assertRaises(efcm.IncompleteCount, self.cm.leader)
+        self.assertRaises(cmx.IncompleteCount, self.cm.leader)
     
     def test_irv_tennessee(self):
         self.cm.count(eftd.TN_IRV_100)
@@ -53,10 +59,10 @@ class TestIRV(CountMethodTest):
 class TestCoombs(CountMethodTest):
 
     def setUp(self):
-        self.cm = efcm.CoombsMethod()
+        self.cm = coombs.CoombsMethod()
 
     def test_premature(self):
-        self.assertRaises(efcm.IncompleteCount, self.cm.leader)
+        self.assertRaises(cmx.IncompleteCount, self.cm.leader)
 
     def test_coombs_tennessee(self):
         self.cm.count(eftd.TN_IRV_100)
@@ -81,7 +87,7 @@ class TestCoombs(CountMethodTest):
 class TestContingent(CountMethodTest):
     
     def setUp(self):
-        self.cm = efcm.ContingentVote()
+        self.cm = cv.ContingentVote()
 
     def test_supplementary(self):
         self.cm.count(eftd.ABC_CV_2)
