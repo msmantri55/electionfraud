@@ -5,6 +5,7 @@ import unittest
 
 import electionfraud.testdata as eftd
 
+import electionfraud.countmethod.borda as borda
 import electionfraud.countmethod.contingent as cv
 import electionfraud.countmethod.coombs as coombs
 import electionfraud.countmethod.exception as cmx
@@ -113,7 +114,71 @@ class TestContingent(CountMethodTest):
         # round 2
         self.assertEqual(self.cm.residue[1][eftd.A], 73)
         self.assertEqual(self.cm.residue[1][eftd.D], 47)
+
+class TestTraditionalBorda(CountMethodTest):
+
+    def setUp(self):
+        self.cm = None
+    
+    def test_premature(self):
+        self.cm = borda.ModifiedBorda()
+        self.assertRaises(cmx.IncompleteCount, self.cm.leader)
+
+    def test_tennessee(self):
+        self.cm = borda.TraditionalBorda(len(eftd.TENNESSEE.keys()))
+        self.cm.count(eftd.TN_IRV_100)
+        self.assertEqual(self.cm.result[eftd.memphis], 126)
+        self.assertEqual(self.cm.result[eftd.nashville], 194)
+        self.assertEqual(self.cm.result[eftd.chattanooga], 173)
+        self.assertEqual(self.cm.result[eftd.knoxville], 107)
+
+    def test_abcd(self):
+        self.cm = borda.TraditionalBorda(4)
+        self.cm.count(eftd.ABCD_CV_4)
+        self.assertEqual(self.cm.result[eftd.a], 153)
+        self.assertEqual(self.cm.result[eftd.b], 151)
+        self.assertEqual(self.cm.result[eftd.c], 205)
+        self.assertEqual(self.cm.result[eftd.d], 91)
+
+class TestNauruBorda(CountMethodTest):
+
+    def setUp(self):
+        self.cm = borda.NauruBorda()
+
+    def test_nauru(self):
+        self.skipTest('no test case found yet')
+
+class TestKiribatiBorda(CountMethodTest):
+    
+    def setUp(self):
+        self.cm = borda.KiribatiBorda(0)
+
+    def test_kiribati(self):
+        self.skipTest('no test case found yet')
         
+class TestModifiedBorda(CountMethodTest):
+
+    def setUp(self):
+        self.cm = borda.ModifiedBorda()
+
+    def test_modified(self):
+        self.skipTest('no test case found yet')
+
+class TestBaldwin(CountMethodTest):
+
+    def setUp(self):
+        pass
+
+    def test_baldwin_placeholder(self):
+        self.skipTest('poor description of method, no test case found yet')
+
+class TestNanson(CountMethodTest):
+
+    def setUp(self):
+        pass
+
+    def test_nanson_placeholder(self):
+        self.skipTest('poor description of method, no test case found yet')
 
 if __name__ == '__main__':
     unittest.main()

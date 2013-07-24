@@ -37,8 +37,8 @@ class FirstPastThePost(efcmabc.AbstractCountMethod):
     def interpret_result(self):
         self.are_we_there_yet()
         interpretation = ''
-        for choice in self.results.keys():
-            votes = self.results[choice]
+        for choice in self.result.keys():
+            votes = self.result[choice]
             percentage = 100 * votes / self.residue
             interpretation += '%s got %d of %d votes (%.2f%%)\n' % (choice, votes, self.residue, percentage)
         return interpretation

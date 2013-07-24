@@ -53,3 +53,5 @@ ABCD_CV_4 = ABCD_CV_4 + [[c, b, d, a]] * 5
 ABCD_CV_4 = ABCD_CV_4 + [[b, c, d, a]] * 23
 ABCD_CV_4 = ABCD_CV_4 + [[d, c, b, a]] * 21
 
+# http://en.wikipedia.org/wiki/Borda_count
+
