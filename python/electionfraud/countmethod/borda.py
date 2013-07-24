@@ -33,7 +33,7 @@ class NauruBorda(BordaBase):
 
 class KiribatiBorda(BordaBase):
     """
-    Must be used with RankExactlyThanInOrderOfPreference(N), where N
+    Must be used with RankExactlyInOrderOfPreference(N), where N
     is less than the size of the field of choices.  Unranked choices
     are awarded 0 points.  (Supposedly Kiribati sets N=4.)
     """
