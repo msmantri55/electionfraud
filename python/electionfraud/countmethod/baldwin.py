@@ -14,7 +14,17 @@ class BaldwinBase(mrx.MultiRoundExhaustible, metaclass=abc.ABCMeta):
     candidate remains.
 
     Expected response format is Rank*InOrderOfPreference.
+
+    Might be more willing to implement this if there were some easily
+    accessible test data.  Also, the two sentences we have don't specify
+    which variant of the Borda count to use...
     """
+    def __init__(self):
+        raise NotImplemented()
+
+    def count(self, responses):
+        raise NotImplemented()
+
 
 class BaldwinTraditional(BaldwinBase):
 
@@ -27,4 +37,3 @@ class BaldwinModified(BaldwinBase):
     def __init__(self):
         super().__init__()
 
-    pass

@@ -159,7 +159,20 @@ class TestBucklin(CountMethodTest):
         self.assertEqual(self.cm.residue[0][eftd.chattanooga], 15)
         self.assertEqual(self.cm.residue[0][eftd.knoxville], 17)
 
-        
+class TestSTV(CountMethodTest):
+
+    def setUp(self):
+        pass
+
+    def test_party_foods(self):
+        self.skipTest('results and residue formats not determined')
+        self.cm = stv.SingleTransferableVote(5, 3)
+        self.cm.count(eftd.FOOD_STV_20)
+
+    def test_abcd(self):
+        self.skipTest('results and residue formats not determined')
+        self.cm = stv.SingleTransferableVote(4, 3)
+        self.cm.count(eftd.ABCD_STV_57)
 
 class TestNauruBorda(CountMethodTest):
 
