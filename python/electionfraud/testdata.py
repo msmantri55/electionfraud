@@ -55,3 +55,21 @@ ABCD_CV_4 = ABCD_CV_4 + [[d, c, b, a]] * 21
 
 # http://en.wikipedia.org/wiki/Borda_count
 
+# http://en.wikipedia.org/wiki/Single_Transferable_Vote
+
+orange = Choice('Orange')
+pear = Choice('Pear')
+chocolate = Choice('Chocolate')
+strawberry = Choice('Strawberry')
+sweets = Choice('Sweets')
+
+FOOD_STV_20 = [[orange]] * 4
+FOOD_STV_20 = FOOD_STV_20 + [[pear, orange]] * 2
+FOOD_STV_20 = FOOD_STV_20 + [[chocolate, strawberry]] * 8
+FOOD_STV_20 = FOOD_STV_20 + [[chocolate, sweets]] * 4
+FOOD_STV_20 = FOOD_STV_20 + [[strawberry]]
+FOOD_STV_20 = FOOD_STV_20 + [[sweets]]
+
+ABCD_STV_57 = [[A, B, C, D]] * 16
+ABCD_STV_57 = ABCD_STV_57 + [[A, C, B, D]] * 24
+ABCD_STV_57 = ABCD_STV_57 + [[D, A, B, C]] * 17
