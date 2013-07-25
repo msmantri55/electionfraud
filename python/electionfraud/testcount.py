@@ -6,6 +6,7 @@ import unittest
 import electionfraud.testdata as eftd
 
 import electionfraud.countmethod.borda as borda
+import electionfraud.countmethod.bucklin as bucklin
 import electionfraud.countmethod.contingent as cv
 import electionfraud.countmethod.coombs as coombs
 import electionfraud.countmethod.exception as cmx
@@ -139,6 +140,26 @@ class TestTraditionalBorda(CountMethodTest):
         self.assertEqual(self.cm.result[eftd.b], 151)
         self.assertEqual(self.cm.result[eftd.c], 205)
         self.assertEqual(self.cm.result[eftd.d], 91)
+
+class TestBucklin(CountMethodTest):
+
+    def setUp(self):
+        self.cm = bucklin.Bucklin()
+
+    def test_bucklin_tennessee(self):
+        self.cm.count(eftd.TN_IRV_100)
+        #
+        self.assertEqual(self.cm.result[eftd.memphis], 42)
+        self.assertEqual(self.cm.result[eftd.nashville], 68)
+        self.assertEqual(self.cm.result[eftd.chattanooga], 58)
+        self.assertEqual(self.cm.result[eftd.knoxville], 32)
+        # 
+        self.assertEqual(self.cm.residue[0][eftd.memphis], 42)
+        self.assertEqual(self.cm.residue[0][eftd.nashville], 26)
+        self.assertEqual(self.cm.residue[0][eftd.chattanooga], 15)
+        self.assertEqual(self.cm.residue[0][eftd.knoxville], 17)
+
+        
 
 class TestNauruBorda(CountMethodTest):
 
