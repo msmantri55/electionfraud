@@ -3,6 +3,7 @@
 import collections.abc
 import fractions
 import logging
+import random
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -94,7 +95,29 @@ class HareRandom(Redistributor):
     """
     Choose ballots randomly, without repetition.
     """
-    pass
+    def __init__(self, responses):
+        self.responses = responses.copy()
+
+    def __next__(self):
+        try:
+            while True:
+                try:
+                    if len(self.responses):
+                        n = random.randint(0, len(self.responses) - 1)
+                        item = self.responses.pop(n)
+                        yield item
+                    else:
+                        raise StopIteration()
+                finally:
+                    pass
+        finally:
+            pass
+        return None
+
+    __call__ = __next__
+    __iter__ = __next__
+
+        
 
 class Gregory(Redistributor):
     """
